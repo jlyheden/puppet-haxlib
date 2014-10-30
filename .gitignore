@@ -1,0 +1,5 @@
+.gems/
+.bundle/
+*.lock
+*.swp
+spec/fixtures/
