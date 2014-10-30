@@ -1,16 +1,5 @@
 require 'spec_helper'
-require 'puppet/pops'
-
-#describe 'get_details' do
-#  it "test this crap" do
-#    Puppet::Parser::Functions.autoloader.loadall
-#    @compiler = Puppet::Parser::Compiler.new(Puppet::Node.new("foo"))
-#    @scope = Puppet::Parser::Scope.new(@compiler)
-#    resource = Puppet::Resource.new("user", "foo")
-#    @compiler.add_resource(@scope, resource)
-#    expect(@scope.function_get_details([resource])).to be_true
-#  end
-#end
+#require 'puppet/pops'
 
 describe 'get_resource' do
 
@@ -23,9 +12,26 @@ describe 'get_resource' do
     @scope = Puppet::Parser::Scope.new(@compiler)
   end
 
-  it {
-    resource = Puppet::Resource.new("user", "foo")
+  it "retrieve home parameter from user foo resource" do
+    resource = Puppet::Resource.new("user", "foo", {:parameters => {:home => '/bar'}})
     @compiler.add_resource(@scope, resource)
-    expect(@scope.function_get_resource([resource, 'home'])).to be_true
-  }
+    expect(@scope.function_get_resource([resource, 'home'])).to eq('/bar')
+  end 
+
+  it "retrieve all parameters from user foo resource" do
+    resource = Puppet::Resource.new("user", "foo", {:parameters => {:home => '/bar', :uid => '1001'}})
+    @compiler.add_resource(@scope, resource)
+    expect(@scope.function_get_resource([resource])).to match('home' => '/bar', 'uid' => '1001')
+  end
+
+  it "retrieve home parameter from nonexisting resource" do
+    resource = Puppet::Resource.new("user", "foo", {:parameters => {:home => '/bar', :uid => '1001'}})
+    expect(@scope.function_get_resource([resource, 'home'])).to be_nil
+  end
+
+  it "retrieve all parameters from nonexisting resource" do
+    resource = Puppet::Resource.new("user", "foo", {:parameters => {:home => '/bar', :uid => '1001'}})
+    expect(@scope.function_get_resource([resource])).to be_nil
+  end
+
 end
